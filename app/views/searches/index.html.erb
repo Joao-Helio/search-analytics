@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search Analytics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css", media: "all" %>
+    <%= javascript_importmap_tags %>
+    <style>
+      #search-container {
+        margin: 20px;
+      }
+      #searchBox {
+        width: 100%;
+        padding: 10px;
+        margin-right: 10px;
+      }
+      #suggestions {
+        margin-top: 10px;
+      }
+      .suggestion-item {
+        cursor: pointer;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+      }
+      .suggestion-item:hover {
+        background-color: #f8f9fa;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container mt-4">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="input-group mb-3">
+            <input type="text" id="searchBox" class="form-control" placeholder="Search for articles..." aria-label="Search">
+            <button class="btn btn-primary" type="button" id="search-button">Search</button>
+          </div>
+          <ul id="suggestions" class="list-group">
+            <!-- Suggestions will be populated here -->
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('searchBox').addEventListener('input', function() {
+        const query = this.value;
+        if (query) {
+          fetch('/searches', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ query: query })
+          })
+          .then(response => response.json())
+          .then(data => {
+            const suggestionsList = document.getElementById('suggestions');
+            suggestionsList.innerHTML = ''; // Clear previous suggestions
+            data.suggestions.forEach(suggestion => {
+              const li = document.createElement('li');
+              li.textContent = suggestion;
+              li.className = 'list-group-item suggestion-item';
+              li.addEventListener('click', () => {
+                document.getElementById('searchBox').value = suggestion;
+                suggestionsList.innerHTML = ''; // Clear suggestions after selection
+              });
+              suggestionsList.appendChild(li);
+            });
+          });
+        } else {
+          document.getElementById('suggestions').innerHTML = '';
+        }
+      });
+    </script>
+  </body>
+</html>
