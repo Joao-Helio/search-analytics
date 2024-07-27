@@ -2,7 +2,9 @@ class SearchesController < ApplicationController
     protect_from_forgery except: :create
   
     def index
-        # Code to render the search page
+        @top_searches = SearchLog.top_searches
+        @recent_searches = SearchLog.recent_searches
+        render :index
     end
 
     def show
@@ -10,17 +12,30 @@ class SearchesController < ApplicationController
     end
   
     def create
-        SearchLog.create!(
-          query: params[:query],
-          ip_address: request.remote_ip
-        )
-        head :ok
+        query = params[:query].strip
+        ip_address = request.remote_ip
+    
+        if query.present?
+            SearchLog.create(query: query, ip_address: ip_address)
+        end
+
+        render json: { status: 'success', message: 'Search logged successfully' }
+    end
+
+    def results
+        @query = params[:query]
+        @articles = Article.search(@query) if @query.present?
+    end
+    
+    def suggestions
+        query = params[:query]
+        articles = Article.where('title ILIKE ?', "%#{query}%").limit(10).pluck(:title)
+        render json: { suggestions: articles }
     end
     
     def analytics
-        @top_searches = SearchLog.top_searches
-        @recent_searches = SearchLog.recent_searches
-        @search_trends = SearchLog.trend_data
+        @top_queries = SearchLog.group(:query).order('count_id DESC').limit(10).count(:id)
+        render json: { top_queries: @top_queries }
     end
     
     private

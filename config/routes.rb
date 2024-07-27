@@ -7,8 +7,14 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "searches#index"
-  post 'search', to: 'searches#create'
-  get 'analytics', to: 'searches#analytics'
+
+  resources :searches, only: [:create] do
+    collection do
+      get 'suggestions'
+      get 'analytics'
+    end
+  end
+
+  get 'search', to: 'searches#results'
   post 'searches', to: 'searches#create'
-  
 end

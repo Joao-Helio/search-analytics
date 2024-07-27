@@ -1,10 +1,10 @@
 class SearchLog < ApplicationRecord
-    def self.top_searches
-        # Example query to get top searches
+    def self.top_searches(limit = 10)
         where(created_at: 30.days.ago..Time.current)
           .group(:query)
           .order('count_id DESC')
-          .count('id')
+          .limit(limit)
+          .count(:id)
     end
   
     def self.recent_searches(limit = 10)

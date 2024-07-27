@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_26_012858) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_27_013746) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "articles", force: :cascade do |t|
+    t.string "author"
+    t.string "claps"
+    t.integer "reading_time"
+    t.string "link"
+    t.string "title"
+    t.text "content"
+    t.tsvector "tsv_content"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "search_logs", force: :cascade do |t|
     t.string "query"
