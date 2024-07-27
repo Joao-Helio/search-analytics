@@ -4,7 +4,7 @@ class SearchesController < ApplicationController
   def index
     @top_searches = fetch_top_searches
     @recent_searches = fetch_recent_searches
-    @top_users = SearchLog.top_users
+    @top_users = SearchLog.group(:ip_address).order('count_id DESC').limit(10).count(:id)
     render :index
   end
 
@@ -36,17 +36,18 @@ class SearchesController < ApplicationController
 
   def analytics
     @top_queries = SearchLog.group(:query).order('count_id DESC').limit(10).count(:id)
-    render json: { top_queries: @top_queries }
+    @top_users = SearchLog.group(:ip_address).order('count_id DESC').limit(10).count(:id)
+    @search_trends = SearchLog.group_by_day(:created_at).count
+    render :index
   end
 
   private
 
-  def fetch_suggestions(query)
-    SearchLog.where('query LIKE ?', "#{query}%")
-             .group(:query)
-             .order('count_id DESC')
-             .limit(5)
-             .count(:id)
-             .keys
+  def fetch_top_searches
+    SearchLog.group(:query).order('count_id DESC').limit(10).count(:id)
+  end
+
+  def fetch_recent_searches
+    SearchLog.order(created_at: :desc).limit(10)
   end
 end
