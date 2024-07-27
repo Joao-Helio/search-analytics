@@ -5,6 +5,7 @@ services:
     plan: free
     buildCommand: 
       - bundle install
+    startCommand: 
       - bundle exec rails db:migrate
       - bundle exec rails db:seed
-    startCommand: bundle exec puma -C config/puma.rb
+      - bundle exec puma -C config/puma.rb
