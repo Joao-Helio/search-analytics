@@ -2,9 +2,6 @@ class SearchesController < ApplicationController
   protect_from_forgery except: :create
 
   def index
-    @top_searches = fetch_top_searches
-    @recent_searches = fetch_recent_searches
-    @top_users = SearchLog.group(:ip_address).order('count_id DESC').limit(10).count(:id)
     render :index
   end
 
@@ -15,13 +12,23 @@ class SearchesController < ApplicationController
   def create
     query = params[:query].strip
     ip_address = request.remote_ip
-
+    user_agent = request.user_agent
+  
+    logger.debug "Search query: #{query}, IP address: #{ip_address}, User Agent: #{user_agent}"
+  
     if query.present?
-      SearchLog.create(query: query, ip_address: ip_address)
+      search_log = SearchLog.new(query: query, ip_address: ip_address, user_agent: user_agent)
+      if search_log.save
+        logger.debug "Search log created: #{search_log.inspect}"
+      else
+        logger.debug "Failed to create search log: #{search_log.errors.full_messages.join(', ')}"
+      end
     end
-
+  
     render json: { status: 'success', message: 'Search logged successfully' }
   end
+  
+  
 
   def results
     @query = params[:query]
@@ -38,8 +45,16 @@ class SearchesController < ApplicationController
     @top_queries = SearchLog.group(:query).order('count_id DESC').limit(10).count(:id)
     @top_users = SearchLog.group(:ip_address).order('count_id DESC').limit(10).count(:id)
     @search_trends = SearchLog.group_by_day(:created_at).count
-    render :index
+    @recent_searches = SearchLog.order(created_at: :desc).limit(10)
+  
+    logger.debug "Top Queries: #{@top_queries.inspect}"
+    logger.debug "Top Users: #{@top_users.inspect}"
+    logger.debug "Search Trends: #{@search_trends.inspect}"
+    logger.debug "Recent Searches: #{@recent_searches.inspect}"
+  
+    render 'analytics/index'
   end
+  
 
   private
 
