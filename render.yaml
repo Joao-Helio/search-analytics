@@ -1,11 +1,9 @@
 services:
   - type: web
-    name: search-analytics
+    name: my-rails-app
     env: ruby
     plan: free
     buildCommand: 
       - bundle install
     startCommand: 
-      - bundle exec rails db:migrate
-      - bundle exec rails db:seed
-      - bundle exec puma -C config/puma.rb
+      - bash -c "bundle exec rails db:migrate && bundle exec rails db:seed && bundle exec puma -C config/puma.rb"
