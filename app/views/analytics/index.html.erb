@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Search Analytics</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css", media: "all", integrity: "sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD", crossorigin: "anonymous" %>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1>Search Analytics</h1>
+
+    <!-- Top Searches -->
+    <div class="mt-4">
+    <h5>Top Searches</h5>
+    <ul class="list-group">
+        <% @top_searches.each do |query, count| %>
+        <li class="list-group-item">
+            <%= query %> - <%= count %> searches
+        </li>
+        <% end %>
+    </ul>
+    </div>
+
+    <!-- Recent Searches -->
+    <div class="mt-4">
+    <h5>Recent Searches</h5>
+    <ul class="list-group">
+        <% @recent_searches.each do |search| %>
+        <li class="list-group-item">
+            <%= search.query %> - <%= search.created_at.strftime("%b %d, %Y %H:%M") %>
+        </li>
+        <% end %>
+    </ul>
+    </div>
+
+    <!-- Top Users -->
+    <div class="mt-4">
+    <h5>Top Users by IP</h5>
+    <ul class="list-group">
+        <% @top_users.each do |ip, count| %>
+        <li class="list-group-item">
+            <%= ip %> - <%= count %> searches
+        </li>
+        <% end %>
+    </ul>
+    </div>
+
+
+    <div class="mt-3">
+      <%= link_to 'Return to Search', root_path, class: 'btn btn-secondary', style: 'margin-bottom: 20px;'  %>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,4 +1,9 @@
 class SearchLog < ApplicationRecord
+  validates :query, presence: true
+  validates :ip_address, presence: true
+  validates :user_agent, presence: true
+  belongs_to :user, optional: true
+
     def self.top_searches(limit = 10)
         where(created_at: 30.days.ago..Time.current)
           .group(:query)
