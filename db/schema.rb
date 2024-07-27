@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_27_013746) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_27_051603) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -32,6 +32,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_27_013746) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "user_agent"
+    t.text "query_segments", default: [], array: true
+    t.integer "user_id"
+    t.index ["created_at"], name: "index_search_logs_on_created_at"
+    t.index ["ip_address"], name: "index_search_logs_on_ip_address"
+    t.index ["user_id"], name: "index_search_logs_on_user_id"
   end
 
 end
